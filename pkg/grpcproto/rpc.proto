@@ -1,0 +1,146 @@
+syntax = "proto3";
+
+
+package grpcproto;
+
+
+message Userid {
+    int32 userid = 1;
+}
+
+message RepTime {
+    //pos where in the times array
+    /*
+	   resource update_time
+	   0:  Pod
+	   1:  PodTemplate
+	   2:  ReplicationController
+	   3:  Service
+	   4:  EndPoint
+	   5:  Node
+	   6:  Binding
+	   7:  Event
+	   8:  LimitRange
+	   9:  ResourceQuota
+	   10: NameSpace
+	   11: Secret
+	   12: ServiceAccount
+	   13: PersistentVolume
+	   14: PersistentVolumeClaim
+	   15: DeleteOptions
+	   16: ComponentStatus
+	   17: ConfigMap
+	*/
+    int32 ResTypeId = 1;
+    int32 userid = 2;
+}
+
+message RespTime {
+    string time = 1;
+}
+
+message K8sReq{
+    //restime update
+    int32 resint = 1;
+    //get, post, put, delete
+    string reqtype = 2;
+    //example api/v1/namespaces?watch=true&timeoutSeconds=3
+    //example api/v1/namespaces, (basicpath + pathParam + quereparam)
+    string url = 3;
+    //json in string
+    string bodyparam = 4;
+    int32 userid = 5;
+}
+
+//message K8sResp{
+//    string status = 1;
+//    string body = 2;
+//}
+
+
+message regLoginReq{
+    //not only localregistry but also remoteregistry default localregistry
+    string url = 1;
+    string username = 2;
+    string password = 3;
+    bool secure = 4;
+    int32 userid = 5;
+}
+
+message regResp{
+    //http code
+    string respcode = 1;
+    //loginresp, listreporesp getimagetagresp regpushresp DelImage
+    string resp = 2;
+    int32 userid = 3;
+}
+
+message RegGetImageTagRep{
+    string images = 1;
+    int32 userid = 2;
+}
+
+message RegImage {
+    string name = 1;
+    //tag or digset
+    string reference = 2;
+}
+
+message RegImageWithId {
+    string name = 1;
+    string reference = 2;
+    int32 userid = 3;
+}
+
+message promeReq{
+    bool is_Range = 1;
+    string url = 2;
+    int32 userid = 3;
+}
+
+message Resp {
+    string httpcode = 1;
+    string resp = 2;
+}
+
+message UseMrRep {
+    string reqmethod = 1;
+    //pathparam process in frontend
+    string requrl = 2;
+    string bodyparam = 3;
+    int32 userid = 4;
+}
+
+message RespwithId {
+    Resp resp = 1;
+    int32 userid = 2;
+}
+
+message UserInfo {
+    string user = 1;
+    string passwd = 2;
+}
+
+
+service G {
+  rpc Login(UserInfo) returns (Resp) {}
+
+  rpc GetResTime(RepTime) returns (RespTime) {}
+  rpc K8sRestApi(K8sReq) returns (Resp) {}
+  rpc K8sStreamApi(K8sReq) returns (stream Resp) {}
+
+  //operate after login
+  rpc RegLogin(regLoginReq) returns(Resp) {}
+  //pull, push only the server where backend is
+  rpc RegListRepo(Userid) returns(Resp) {}
+  rpc RegGetImageTag(RegGetImageTagRep) returns(Resp) {}
+  rpc RegPush(RegImageWithId) returns(Resp) {}
+  rpc RegDelImage(RegImageWithId) returns(Resp) {}
+  rpc RegPull(RegImageWithId) returns(Resp) {}
+
+  //queryrange or query
+  rpc PromQuery(promeReq) returns(Resp) {}
+
+  rpc UserMApi(UseMrRep) returns(Resp) {}
+
+}

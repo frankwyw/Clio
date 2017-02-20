@@ -1,0 +1,10 @@
+FROM centos
+
+COPY frontend /bin/
+
+ENV BACKEND_HOST 127.0.0.1
+ENV BACKEND_PORT 8070
+
+EXPOSE 8079
+
+ENTRYPOINT [./frontend]
